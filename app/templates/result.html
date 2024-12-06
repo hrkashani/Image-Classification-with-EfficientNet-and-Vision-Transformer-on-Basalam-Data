@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتیجه پیش‌بینی</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>نتیجه پیش‌بینی</h1>
+    
+        <div class="img-preview">
+            <img src="{{ url_for('static', filename='uploads/' + image) }}" alt="Uploaded Image">
+        </div>
+    
+        <div class="result-container">
+            <h2>احتمال‌های مدل EfficientNet</h2>
+            <canvas id="chart-efficientnet"></canvas>
+    
+            {% if probs_vit %}
+                <h2>احتمال‌های مدل ViT</h2>
+                <canvas id="chart-vit"></canvas>
+            {% endif %}
+    
+            <h3>دسته نهایی: {{ final_group }}</h3>
+        </div>
+    
+        <a href="/">بارگذاری تصویر دیگر</a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const efficientnetData = {
+            labels: {{ labels|tojson }},  <!-- استفاده از نام دسته‌ها -->
+            datasets: [{
+                label: 'احتمال مدل EfficientNet',
+                data: {{ probs_efficientnet|tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+    
+        const vitData = {
+            labels: {{ labels|tojson }},  <!-- استفاده از نام دسته‌ها -->
+            datasets: [{
+                label: 'احتمال مدل ViT',
+                data: {{ probs_vit|tojson if probs_vit else [] }},
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+    
+        new Chart(document.getElementById('chart-efficientnet'), {
+            type: 'bar',
+            data: efficientnetData,
+        });
+    
+        {% if probs_vit %}
+            new Chart(document.getElementById('chart-vit'), {
+                type: 'bar',
+                data: vitData,
+            });
+        {% endif %}
+    </script>
+    
+
+<footer>
+    <p>&copy; 2024 Your Company | All Rights Reserved</p>
+</footer>
+
+</body>
+</html>
+
